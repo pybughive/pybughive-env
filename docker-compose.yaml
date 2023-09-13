@@ -1,0 +1,32 @@
+version: '3'
+services:
+  pybughive-env:
+    image: pybughive-env
+    build:
+      context: .
+      dockerfile: Dockerfile.pybughive
+    environment:
+      MONGO_URI: mongodb://admin:pybughive@mongodb:27017/pybughive?authSource=admin
+      MONGO_URL: mongodb://admin:pybughive@mongodb:27017/pybughive?authSource=admin
+      INSTALL_DIRECTORY: /data
+    tty: true
+    volumes:
+      - ./data:/data
+    networks:
+      - pybughive-bridge
+  mongodb:
+    image: mongo-custom
+    build:
+      context: .
+      dockerfile: Dockerfile.mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - pybughive-bridge
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: pybughive
+networks:
+  pybughive-bridge:
+    driver: bridge

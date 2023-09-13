@@ -1,0 +1,61 @@
+FROM ubuntu:latest
+
+# export timezone - for python3.9-dev install
+ENV TZ=Europe/Budapest
+
+# place timezone data /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update && \
+	apt-get install -y nano git python3 python3-pip screen zip unzip build-essential nghttp2 libnghttp2-dev
+
+RUN mkdir -p /work
+WORKDIR /work
+
+RUN apt update
+RUN apt install software-properties-common -y
+
+# Install Python versions
+
+RUN add-apt-repository ppa:deadsnakes/ppa -y
+RUN apt-get update
+RUN apt install python3.7-dev python3.7-distutils -y
+RUN apt install python3.9-dev python3.9-distutils -y
+RUN apt install python3.10-dev python3.10-distutils -y
+RUN apt install python3.11-dev python3.11-distutils -y
+RUN apt install libcurl4-openssl-dev libssl-dev -y
+
+VOLUME /env
+
+# Set cache directories
+ENV PIPENV_CACHE_DIR=/env/pipenv_cache
+ENV MONGO_URL=$MONGO_URI
+
+# Set the PIP install directory
+ENV PYTHONUSERBASE=/env/pip_packages
+
+RUN git clone https://github.com/pybughive/pybughive.git /pybughive
+WORKDIR /pybughive
+RUN python3 -m pip install -e .
+
+RUN chmod +x /pybughive/*
+
+# Install virtual environments
+RUN pip install virtualenv pipenv
+RUN apt install python-is-python3
+
+# Install pipx
+RUN python3 -m pip install --user pipx
+RUN python3 -m pipx ensurepath
+
+# Adjust configs
+RUN git config --global pack.windowMemory 2048m
+RUN git config --global pack.packSizeLimit 2048m
+RUN git config --global http.postBuffer 1048576000
+RUN git config --global https.postBuffer 1048576000
+
+RUN mkdir -p /data
+
+WORKDIR /data
+
+VOLUME /data

@@ -1,0 +1,11 @@
+FROM mongo:latest
+
+RUN apt-get update && apt-get install -y git
+
+RUN git clone https://github.com/pybughive/pybughive.git /pybughive
+
+COPY mongo_files/init_mongo.sh /docker-entrypoint-initdb.d/
+
+EXPOSE 27017
+
+CMD ["mongod"]
