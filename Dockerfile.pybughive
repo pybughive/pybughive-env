@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 # export timezone - for python3.9-dev install
 ENV TZ=Europe/Budapest
@@ -19,10 +19,11 @@ RUN apt install software-properties-common -y
 
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 RUN apt-get update
-RUN apt install python3.7-dev python3.7-distutils -y
-RUN apt install python3.9-dev python3.9-distutils -y
-RUN apt install python3.10-dev python3.10-distutils -y
-RUN apt install python3.11-dev python3.11-distutils -y
+RUN apt install python3.7-dev python3.7-distutils python3.7-venv -y
+RUN apt install python3.8-dev python3.8-distutils python3.8-venv -y
+RUN apt install python3.9-dev python3.9-distutils python3.9-venv -y
+RUN apt install python3.10-dev python3.10-distutils python3.10-venv -y
+RUN apt install python3.11-dev python3.11-distutils python3.11-venv -y
 RUN apt install libcurl4-openssl-dev libssl-dev -y
 
 VOLUME /env
@@ -36,7 +37,7 @@ ENV PYTHONUSERBASE=/env/pip_packages
 
 RUN git clone https://github.com/pybughive/pybughive.git /pybughive
 WORKDIR /pybughive
-RUN python3 -m pip install -e .
+RUN python3.11 -m pip install -e .
 
 RUN chmod +x /pybughive/*
 
@@ -45,8 +46,8 @@ RUN pip install virtualenv pipenv
 RUN apt install python-is-python3
 
 # Install pipx
-RUN python3 -m pip install --user pipx
-RUN python3 -m pipx ensurepath
+RUN python3.11 -m pip install --user pipx
+RUN python3.11 -m pipx ensurepath
 
 # Adjust configs
 RUN git config --global pack.windowMemory 2048m
